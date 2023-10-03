@@ -13,7 +13,11 @@ from tqdm import tqdm
 import re
 import os
 import concurrent.futures
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
 import imdb
+
+os.makedirs('movie_reviews',exist_ok=True)
 
 def scrape_data(revs):
     
@@ -46,14 +50,15 @@ def scrape_data(revs):
     
     
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # movie_link = 'https://www.imdb.com/title/tt2906216/reviews/?ref_=tt_ql_2'
     # movie_link = 'https://www.imdb.com/title/tt10366206/reviews/?ref_=tt_ql_2'
+def main_scraper(movie_name:str,save_name:str):
     ia = imdb.Cinemagoer()
-    movies = ia.search_movie('Hangover 2011')
+    movies = ia.search_movie(movie_name)
     movie_id = movies[0].movieID
     movie_link = f'https://www.imdb.com/title/tt{movie_id}/reviews/?ref_=tt_ql_2'
-    driver = webdriver.Edge('msedgedriver.exe')
+    driver = webdriver.Edge(service=Service(EdgeChromiumDriverManager().install()))
     driver.get(movie_link)
     driver.maximize_window()
 
@@ -94,6 +99,6 @@ if __name__ == '__main__':
     df['Review'] = reviews_comment
     df['Rating'] = reviews_rating
 
-    os.makedirs('movie_reviews',exist_ok=True)
+    
     # print(df)
-    df.to_csv(f'movie_reviews/JW_2.csv',index=False)
+    df.to_csv(f'movie_reviews/{save_name}.csv',index=False)
